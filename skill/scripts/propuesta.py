@@ -31,6 +31,17 @@ def propuesta(resp: dict) -> str:
     inv = resp.get("investigacion_rol") or {}
     out = [f"Así va a quedar tu espacio para **{p.get('proyecto', '')}**:", ""]
 
+    carpeta = resp.get("carpeta") or {}
+    if carpeta.get("resumen"):
+        docs = carpeta.get("documentos", [])
+        out += [f"**Lo que aprendí de tu carpeta** (leí {len(docs)} documento{'' if len(docs) == 1 else 's'}): "
+                + carpeta["resumen"].strip()]
+        out += [f"- {x}" for x in carpeta.get("aprendido", [])[:6]]
+        if carpeta.get("sin_leer"):
+            out.append("No leí: " + "; ".join(f"{s['archivos']} ({s['motivo'].rstrip('.')})"
+                                              for s in carpeta["sin_leer"]) + ".")
+        out.append("")
+
     out.append(f"**Tus carpetas** ({arq.get('por_que', '').rstrip('.')}):")
     nucleo = [(rutas.get("contexto"), "lo que necesito saber de tu proyecto (documentos, normas, ejemplos)"),
               (rutas.get("entregables"), "lo que entregas: una carpeta por tarea, con lo aprendido en ella"),

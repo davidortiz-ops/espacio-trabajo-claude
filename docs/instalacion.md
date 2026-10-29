@@ -16,25 +16,28 @@ ejemplo `PS C:\Users\TuNombre>`.
 
 **En Mac:** presiona Cmd + Espacio, escribe `Terminal` y presiona Enter.
 
-## Paso 2. Crea tu carpeta de trabajo y entra en ella
+## Paso 2. Entra en tu carpeta de trabajo
 
-Cambia `mi-proyecto` por el nombre de tu proyecto, sin espacios ni tildes
-(por ejemplo `informes-ventas`).
+Puede ser cualquier carpeta, donde tú quieras: una nueva o una que ya tenga
+tus archivos. Tus archivos se respetan.
 
-**En Windows:**
+**En Windows:** escribe `cd`, un espacio y la ruta de tu carpeta entre
+comillas:
 
 ```powershell
-mkdir C:\trabajo\mi-proyecto -Force; cd C:\trabajo\mi-proyecto
+cd "C:\ruta\de\tu\carpeta"
 ```
 
-**En Mac:**
+Atajo: abre la carpeta en el Explorador de archivos, haz clic en la barra de
+dirección, escribe `powershell` y presiona Enter. PowerShell se abre ya dentro
+de ella.
+
+**En Mac:** escribe `cd` y un espacio, arrastra la carpeta desde el Finder
+hasta la ventana de Terminal y presiona Enter:
 
 ```bash
-mkdir -p ~/trabajo/mi-proyecto && cd ~/trabajo/mi-proyecto
+cd "/ruta/de/tu/carpeta"
 ```
-
-Si ya tienes una carpeta con tus archivos, usa esa: escribe `cd` seguido de
-su ruta. Tus archivos se respetan.
 
 ## Paso 3. Instala el skill Primer Paso
 
@@ -65,10 +68,14 @@ claude
 ```
 
 Si Claude Code te pregunta si confías en la carpeta, elige la opción que dice
-que sí. Luego escribe `empezar` y presiona Enter. Claude te hace unas
-preguntas: tu cargo, tu proyecto, qué quieres lograr, tus tareas habituales y
-las herramientas que usas. Responde con tus palabras; no hace falta que sea
-largo.
+que sí. Luego escribe `empezar` y presiona Enter.
+
+Primero Claude lee lo que ya hay en tu carpeta: documentos, hojas de cálculo y
+presentaciones. Si encuentra skills sin instalar, las instala. No mueve ni
+cambia tus archivos, y no abre los que pueden tener claves. Después te cuenta
+lo que entendió y te pregunta solo lo que falte: tu cargo, tu proyecto, qué
+quieres lograr, tus tareas habituales y las herramientas que usas. Responde
+con tus palabras; no hace falta que sea largo.
 
 Mientras tanto investiga tu rol y al final te muestra una propuesta. Léela y
 responde «Sí, prepáralo» o pide los cambios que quieras.
@@ -81,18 +88,10 @@ terminarla, te pregunta cuánto te habría tomado a mano.
 
 ## Cada día, para volver a trabajar
 
-Abre la terminal (paso 1), entra a tu carpeta y abre Claude:
+Abre la terminal (paso 1), entra a tu carpeta (paso 2) y abre Claude:
 
-**En Windows:**
-
-```powershell
-cd C:\trabajo\mi-proyecto; claude
 ```
-
-**En Mac:**
-
-```bash
-cd ~/trabajo/mi-proyecto && claude
+claude
 ```
 
 Claude te recuerda dónde quedaste. Para una tarea habitual escribe `/` y el

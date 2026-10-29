@@ -101,6 +101,9 @@ resp = {
     "programas": [{"nombre": "Programa ausente", "para": "Correr el análisis",
                    "comprobar": "programa-que-no-existe-pp --version", "instalar": "https://ejemplo.org/descargas"}],
     "investigacion_rol": ROL,
+    "carpeta": {"fecha": "29-oct-2026", "resumen": "Un repositorio previo con un script de análisis.",
+                "aprendido": ["Ya hay código en src/"],
+                "documentos": [{"archivo": "README.md", "aporta": "El nombre del repositorio"}]},
 }
 (A / "respuestas-espacio.json").write_text(json.dumps(resp, ensure_ascii=False), encoding="utf-8")
 run(A, ["verificar.py"], esperado=2)
@@ -407,6 +410,7 @@ respC = json.loads(json.dumps(resp))
 respC["perfil"]["tareas"] = [{"tarea": "Informe mensual del cliente", "frecuencia": "mensual", "entrega": "informe"},
                              {"tarea": "Actualizar el tablero semanal", "frecuencia": "semanal", "entrega": "tablero"}]
 respC.pop("programas")
+respC.pop("carpeta")
 (C / "respuestas-espacio.json").write_text(json.dumps(respC, ensure_ascii=False), encoding="utf-8")
 r = run(C, ["auditar.py", "--json"], esperado=1)
 hallC = json.loads(r.stdout)
@@ -452,9 +456,91 @@ run(C, ["inventario.py", "--cambios"], esperado=1)
 if "por revisar: publicar" not in run(C, ["inicio.py"], stdin="{}").stdout:
     fallos.append("el aviso de inicio no avisa del skill cambiado")
 
+# ---------- Repo E: una carpeta con documentos y skills sueltas
+import zipfile  # noqa: E402
+E = repo("e")
+(E / "informes").mkdir()
+for mes in ("ene", "feb", "mar"):
+    (E / f"informes/informe-ventas-{mes}-2026.csv").write_text("region,ventas\nnorte,10\n", encoding="utf-8")
+with zipfile.ZipFile(E / "Brief del cliente.docx", "w") as z:
+    z.writestr("word/document.xml", "<w:document><w:body><w:p><w:r><w:t>Objetivo: abrir la tienda en Bogotá"
+                                    "</w:t></w:r></w:p></w:body></w:document>")
+with zipfile.ZipFile(E / "metas.xlsx", "w") as z:
+    z.writestr("xl/workbook.xml", '<workbook><sheets><sheet name="Metas 2026" sheetId="1"/></sheets></workbook>')
+    z.writestr("xl/sharedStrings.xml", "<sst><si><t>Meta trimestral</t></si></sst>")
+(E / ".env").write_text("CLAVE_SECRETA=no-debe-salir\n", encoding="utf-8")
+(E / "mis-skills/redactar").mkdir(parents=True)
+(E / "mis-skills/redactar/SKILL.md").write_text("---\nname: redactar-correos\ndescription: Redacta correos.\n---\n"
+                                                "Usa la plantilla.\n", encoding="utf-8")
+(E / "mis-skills/redactar/plantilla.md").write_text("Hola {nombre}\n", encoding="utf-8")
+with zipfile.ZipFile(E / "cotizar.skill", "w") as z:
+    z.writestr("cotizar/SKILL.md", "---\nname: cotizar\ndescription: Arma cotizaciones.\n---\nPasos.\n")
+    z.writestr("cotizar/scripts/precio.py", "print(1)\n")
+    z.writestr("../fuera.txt", "no")
+ex = json.loads(run(E, ["explorar.py", "--json"], esperado=0).stdout)
+rutas = {d["ruta"]: d for d in ex["para_leer"]}
+if "Bogotá" not in rutas.get("Brief del cliente.docx", {}).get("extracto", ""):
+    fallos.append("explorar no sacó el texto del .docx")
+if "Metas 2026" not in rutas.get("metas.xlsx", {}).get("extracto", ""):
+    fallos.append("explorar no sacó las hojas del .xlsx")
+if "mis-skills/redactar/plantilla.md" in rutas:
+    fallos.append("explorar contó los archivos de una skill como documentos de la persona")
+if not any(x["archivos"] == 3 and "informe-ventas" in x["patron"] for x in ex["repetidos"]):
+    fallos.append(f"explorar no vio los informes que se repiten: {ex['repetidos']}")
+if ".env" not in ex["posibles_claves"] or "no-debe-salir" in json.dumps(ex):
+    fallos.append("explorar no apartó el archivo de claves o leyó su contenido")
+if sorted(s["nombre"] for s in ex["skills_sin_instalar"]) != ["cotizar", "redactar-correos"]:
+    fallos.append(f"explorar no encontró las skills sin instalar: {ex['skills_sin_instalar']}")
+if "Bogotá" not in run(E, ["explorar.py", "--texto", "Brief del cliente.docx"], esperado=0).stdout:
+    fallos.append("explorar --texto no devolvió el texto del .docx")
+run(E, ["explorar.py", "--texto", ".env"], esperado=2)
+respE = {k: v for k, v in resp.items() if k not in ("carpeta", "programas")}
+(E / "respuestas-espacio.json").write_text(json.dumps(respE, ensure_ascii=False), encoding="utf-8")
+r = run(E, ["montar.py", "--respuestas", "respuestas-espacio.json", "--dry-run"], esperado=2)
+if "sin instalar" not in r.stderr or "falta el bloque 'carpeta'" not in r.stderr:
+    fallos.append("montar no exigió instalar las skills y revisar la carpeta")
+run(E, ["explorar.py", "--skills"], esperado=1)
+run(E, ["explorar.py", "--instalar-skills"], esperado=0)
+for s in ("redactar-correos/plantilla.md", "cotizar/SKILL.md", "cotizar/scripts/precio.py"):
+    if not (E / ".claude/skills" / s).is_file():
+        fallos.append(f"no se instaló .claude/skills/{s}")
+if (E / ".claude/fuera.txt").exists() or (E / ".claude/skills/fuera.txt").exists():
+    fallos.append("instalar una skill comprimida escribió fuera de su carpeta")
+if not (E / "mis-skills/redactar/SKILL.md").is_file() or not (E / "cotizar.skill").is_file():
+    fallos.append("instalar las skills tocó los originales")
+run(E, ["explorar.py", "--skills"], esperado=0)
+run(E, ["revisar.py", "--borrador"], esperado=0)
+rE = json.loads((E / "respuestas-espacio.json").read_text(encoding="utf-8"))
+rE["carpeta"] = {"fecha": "29-oct-2026", "resumen": "Ventas de una tienda nueva.",
+                 "documentos": [{"archivo": "Brief del cliente.docx", "aporta": "El objetivo del proyecto"}]}
+(E / "respuestas-espacio.json").write_text(json.dumps(rE, ensure_ascii=False), encoding="utf-8")
+r = run(E, ["montar.py", "--respuestas", "respuestas-espacio.json", "--dry-run"], esperado=2)
+if "metas.xlsx" not in r.stderr:
+    fallos.append("montar aceptó documentos sin leer ni justificar")
+rE["carpeta"]["documentos"].append({"archivo": "metas.xlsx", "aporta": "Las metas del año"})
+rE["carpeta"]["sin_leer"] = [{"archivos": "informes/", "motivo": "Datos mensuales; se leen al hacer el informe"}]
+(E / "respuestas-espacio.json").write_text(json.dumps(rE, ensure_ascii=False), encoding="utf-8")
+run(E, ["montar.py", "--respuestas", "respuestas-espacio.json"], esperado=0)
+run(E, ["verificar.py"], esperado=0)
+(E / "otra").mkdir()
+(E / "otra/SKILL.md").write_text("---\nname: otra\ndescription: Otra.\n---\n", encoding="utf-8")
+if "skill otra" not in run(E, ["verificar.py"], esperado=1).stdout:
+    fallos.append("verificar no exige instalar una skill nueva que apareció en la carpeta")
+shutil.rmtree(E / "otra")
+ctxE = E / "contexto/lo-que-habia-en-la-carpeta.md"
+if not ctxE.is_file() or "Las metas del año" not in ctxE.read_text(encoding="utf-8"):
+    fallos.append("montar no llevó lo aprendido de la carpeta al contexto")
+# la raíz es la carpeta donde se instaló el skill, aunque se trabaje desde una subcarpeta
+env = {k: v for k, v in os.environ.items() if k != "CLAUDE_PROJECT_DIR"}
+r = subprocess.run([sys.executable, str(E / ".claude/skills/primeros-pasos/scripts/explorar.py"), "--json"],
+                   cwd=E / "informes", capture_output=True, text=True, encoding="utf-8", env=env)
+if Path(json.loads(r.stdout)["raiz"]).resolve() != E.resolve():
+    fallos.append("la raíz no es la carpeta donde se instaló el skill")
+
 # ---------- Repo D: retirar el skill sin tocar lo que creó
 D = repo("d")
-(D / "respuestas-espacio.json").write_text(json.dumps(resp, ensure_ascii=False), encoding="utf-8")
+(D / "respuestas-espacio.json").write_text(json.dumps({k: v for k, v in resp.items() if k != "carpeta"},
+                                                      ensure_ascii=False), encoding="utf-8")
 run(D, ["montar.py", "--respuestas", "respuestas-espacio.json"], esperado=0)
 if run(D, ["retirar.py", "--estado"]).stdout.strip() != "activo":
     fallos.append("retirar --estado no dice activo")

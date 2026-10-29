@@ -45,6 +45,10 @@ en `{{DOCS}}/carpetas.md`.
 
 ## Tus atajos
 
+Lo que la persona ya tenía en la carpeta antes de preparar el espacio está
+resumido en `{{CONTEXTO}}lo-que-habia-en-la-carpeta.md`: qué aporta cada
+documento y lo que se aprendió de ellos. Se lee antes de preguntarle algo.
+
 Si el repositorio ya traía skills, `{{CONTEXTO}}skills-del-repositorio.md`
 dice cuál usar para cada tarea, qué reglas imponen y qué conocimiento no está
 validado; las tareas que cubre un skill existente se hacen con ese skill.

@@ -27,7 +27,7 @@ CONVENCIONES = SKILL / "convenciones"   # se copian a DOCS en cada espacio
 CONFIG = "espacio.json"
 ESTADO = ".espacio"                  # derivados: grafo, sesiones, respaldos
 DOCS = "docs/espacio-de-trabajo"     # convenciones copiadas al repositorio
-VERSION = "1.4.0"
+VERSION = "1.5.0"
 MARCA_INICIO = "<!-- primeros-pasos:inicio -->"
 MARCA_FIN = "<!-- primeros-pasos:fin -->"
 MESES = ("ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic")
@@ -52,15 +52,20 @@ def utf8() -> None:
 
 
 def encontrar_raiz(dada: str | None = None) -> Path:
-    """--raiz > $CLAUDE_PROJECT_DIR > subir desde el cwd buscando espacio.json,
-    .git o .claude (sin llegar a la carpeta personal) > carpeta donde está
-    instalado el skill > cwd."""
+    """--raiz > $CLAUDE_PROJECT_DIR > carpeta donde está instalado el skill
+    (la que eligió la persona, esté donde esté) > subir desde el cwd buscando
+    espacio.json, .git o .claude (sin llegar a la carpeta personal) > cwd."""
     if dada:
         return Path(dada).expanduser().resolve()
     env = os.environ.get("CLAUDE_PROJECT_DIR")
     if env and Path(env).is_dir():
         return Path(env).resolve()
     casa = Path.home().resolve()
+    # .claude/skills/primeros-pasos, o .claude/espacio si el skill se retiró
+    if SKILL.parent.name in ("skills", ".claude") and ".claude" in (SKILL.parent.name, SKILL.parent.parent.name):
+        instalada = SKILL.parent.parent.parent if SKILL.parent.name == "skills" else SKILL.parent.parent
+        if instalada != casa:
+            return instalada
     cwd = Path.cwd().resolve()
     for d in (cwd, *cwd.parents):
         if (d / CONFIG).is_file():
@@ -70,10 +75,6 @@ def encontrar_raiz(dada: str | None = None) -> Path:
             break
         if (d / ".git").exists() or (d / ".claude").is_dir():
             return d
-    if SKILL.parent.name == "skills" and SKILL.parent.parent.name == ".claude":
-        candidata = SKILL.parent.parent.parent
-        if candidata != casa:
-            return candidata
     return cwd
 
 

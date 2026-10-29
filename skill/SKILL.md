@@ -1,8 +1,10 @@
 ---
 name: primeros-pasos
 description: >
-  Configuración inicial del espacio de trabajo de un colaborador en cualquier
-  repositorio, para cualquier cargo y proyecto. Entrevista a la persona (cargo,
+  Configuración inicial del espacio de trabajo de un colaborador en la carpeta
+  donde se instala, esté donde esté, para cualquier cargo y proyecto. Lee todo
+  lo que ya hay en la carpeta (documentos, hojas, presentaciones) e instala
+  las skills que encuentre sueltas; luego entrevista a la persona (cargo,
   proyecto y objetivo, conocimientos que Claude debe tener, tareas habituales,
   herramientas), investiga a fondo su rol (responsabilidades, obligaciones,
   tareas comunes y programas que necesita), saca de ahí los lineamientos de la
@@ -31,6 +33,7 @@ va cada cosa, qué se resolvió antes y cómo aprender de cada tarea.
 | Pieza | Para qué |
 |---|---|
 | `espacio.json` | La configuración: perfil, arquitectura y rutas de cada rol. Todo lo demás se deriva de aquí |
+| Lo que había en la carpeta | Cada documento que la persona ya tenía, leído, con lo que aporta y lo aprendido (`<contexto>/lo-que-habia-en-la-carpeta.md`); las skills sueltas quedan instaladas en `.claude/skills/` |
 | Investigación del rol | Responsabilidades, obligaciones, tareas comunes y programas del oficio, con fuentes; de ella salen los lineamientos (`references/investigar-rol.md`) |
 | Arquitectura de carpetas | Elegida según el objetivo y los lineamientos del rol (`references/arquitecturas.md`) |
 | Programas para trabajar | Git, Python, Node.js y Playwright siempre, más los que pida el rol; `programas.py` los comprueba e instala, el aviso de inicio dice cuáles faltan y nada se instala sin confirmación |
@@ -76,6 +79,7 @@ remotos de git ni publica nada fuera del repositorio.
 | Situación | Ir a |
 |---|---|
 | No hay `espacio.json` en la raíz | Montaje completo, pasos 1 a 9 |
+| Hay skills en la carpeta sin instalar en `.claude/skills/` | `explorar.py --instalar-skills` (obligatorio), y luego la fila siguiente |
 | Hay skills nuevos o cambiados sin revisar, o la persona pide «revisa mis skills» | `references/skills-existentes.md`, y luego Ampliar con el bloque `skills_existentes` |
 | Hay `espacio.json` y la persona trae algo nuevo (proyecto, cargo, tareas) | Ampliar |
 | El aviso de inicio o `verificar.py` dice que faltan piezas | Reparar |
@@ -115,12 +119,59 @@ Playwright). Si la instalación pide permisos de administrador o una ventana,
 pásale la orden (`programas.py --comando <nombre>`) para que la corra con
 `! <orden>`. Un programa que falte no detiene el montaje.
 
-## Paso 2 — Mirar el repositorio
+## Paso 2 — Conocer la carpeta
 
-Antes de preguntar, lista la raíz y lee lo que ya haya: `README`, `CLAUDE.md`,
-`docs/`, la estructura de código. Sirve para no preguntar lo que ya está
-escrito y para el paso 4 de `references/arquitecturas.md` (adoptar lo que
-existe, no mover nada).
+La carpeta donde se instaló el skill es la de la persona, esté en la ruta que
+esté. Todo lo que ya tiene ahí es la primera fuente: se lee **antes** de
+preguntar nada, y la entrevista solo confirma lo que se dedujo y pregunta lo
+que falte.
+
+```bash
+python <skill>/scripts/explorar.py
+```
+
+Muestra cuántos archivos hay y de qué tipo, las carpetas, lo más reciente, lo
+que se repite (pistas de tareas habituales: `informe-ventas` cada mes), los
+documentos en orden de prioridad con un extracto de cada uno, los archivos
+que pueden tener claves (nunca se leen ni se abren) y las skills sin instalar.
+
+1. **Skills sin instalar (obligatorio).** Si la carpeta trae skills fuera de
+   `.claude/skills/<nombre>/` (una carpeta con `SKILL.md` en cualquier parte,
+   o un `.skill` o `.zip` que la contenga), instálalas antes de seguir. Copia
+   cada una a `.claude/skills/<nombre>/` sin tocar el original:
+
+   ```bash
+   python <skill>/scripts/explorar.py --instalar-skills
+   ```
+
+   Si una choca con otra instalada distinta del mismo nombre, no se toca:
+   pregúntale a la persona cuál vale. `montar.py` no acepta el montaje
+   mientras quede alguna sin instalar, y `verificar.py` lo marca como
+   `FALTA` si aparece una después. Ya instaladas, entran en la revisión de
+   skills de abajo como cualquier otra.
+2. **Leer los documentos.** Léelos completos, en el orden que da el script:
+   los de texto y PDF con `Read`, y los `.docx`, `.xlsx`, `.pptx` y `.odt`
+   con `explorar.py --texto "<ruta>"`. De las hojas de cálculo basta con
+   las hojas, los encabezados y unas filas. Si son muchos (más de 40),
+   lee completos los que más pesan (los que el script pone primero, los más
+   recientes y uno de cada grupo que se repite) y del resto, el extracto;
+   lo que no leas va en `sin_leer` con su motivo («fotos del evento»,
+   «exportes mensuales con la misma estructura que el de marzo»).
+3. **Sacar conclusiones.** De lo leído, anota qué dice la carpeta del cargo,
+   el proyecto y su objetivo, las tareas habituales (lo que se repite), lo
+   que se entrega y a quién, las herramientas (por los tipos de archivo y lo
+   que mencionan los documentos), los conocimientos que exige, las personas
+   u organizaciones que aparecen y los accesos que harán falta. Solo lo que
+   el material dice: lo que no esté escrito se pregunta, no se supone.
+4. **Guardarlo para el montaje** en el bloque `carpeta` de
+   `respuestas-espacio.json` (`references/entrevista.md` § 5): cada documento
+   leído con lo que aporta, lo aprendido y lo que no se leyó con su motivo.
+   `montar.py` lo exige cuando la carpeta tiene documentos (cada uno, leído o
+   justificado) y lo deja en `<contexto>/lo-que-habia-en-la-carpeta.md`.
+
+Si la carpeta está vacía, todo sale de la entrevista. Si ya hay `README`,
+`CLAUDE.md` o código, también sirven para el paso 4 de
+`references/arquitecturas.md` (adoptar lo que existe, no mover nada).
 
 Luego, el inventario de lo que ya trae:
 
@@ -147,8 +198,11 @@ hallazgos dudosos y decidir con la persona. Detalle en
 ## Paso 3 — Entrevista
 
 Abre con una frase: *«Voy a preparar tu espacio de trabajo. Son unas pocas
-preguntas y no guardo nada hasta que me confirmes.»* Sigue
-`references/entrevista.md`: una ronda abierta (cargo, proyecto y objetivo,
+preguntas y no guardo nada hasta que me confirmes.»* Si la carpeta tenía
+material, empieza por lo que entendiste de ella (cinco o seis líneas: qué
+haces, para qué es el proyecto, qué tareas ves que se repiten) y pide que lo
+corrija; de la ronda abierta pregunta solo lo que la carpeta no respondió.
+Sigue `references/entrevista.md`: una ronda abierta (cargo, proyecto y objetivo,
 conocimientos, tareas, herramientas), como mucho una repregunta, y una ronda
 cerrada con `AskUserQuestion` (uno o varios proyectos, destinatarios, trato,
 historial de versiones).
@@ -197,6 +251,8 @@ python <skill>/scripts/propuesta.py
 Incluye esto (referencia de lo que genera):
 
 > Así va a quedar tu espacio para **Tablero logístico**:
+> - **Lo que aprendí de tu carpeta** (si tenía material): cuántos documentos
+>   leí, lo que entendí de ellos y lo que no leí, con su motivo.
 > - **Tus carpetas** (porque tu trabajo es convertir exportes del ERP en
 >   indicadores semanales): *(árbol de primer y segundo nivel, con una
 >   línea de para qué sirve cada carpeta)*
@@ -265,9 +321,10 @@ le falte (todo opcional), y pon primero **hacer su primera tarea real**:
   instala y para qué. Si un instalador pide permisos de administrador, se lo
   explicas y lo corre la persona (`! <orden>`). Al final, `programas.py` para
   confirmarlo.
-- **Traer los documentos del proyecto** a la carpeta de contexto (briefs,
-  manuales, contratos, datos de ejemplo). Leerlos completos y resumir en una
-  línea qué aporta cada uno.
+- **Traer los documentos que falten** a la carpeta de contexto (briefs,
+  manuales, contratos, datos de ejemplo que no estaban en la carpeta). Leerlos
+  completos y sumar a `lo-que-habia-en-la-carpeta.md` una línea de qué aporta
+  cada uno.
 - **Investigar los conocimientos** de su perfil que aún no tengan memoria ni
   investigación: el protocolo de `docs/espacio-de-trabajo/investigacion.md`,
   empezando por el tema que más pese en sus tareas. Antes, dile cuántas
@@ -345,6 +402,8 @@ python <skill>/scripts/montar.py
 python <skill>/scripts/verificar.py
 ```
 
+Si `verificar.py` marca una `skill` sin instalar, primero
+`explorar.py --instalar-skills` y su revisión (`references/skills-existentes.md`).
 Sin `--respuestas`, todo sale de `espacio.json`. Repone carpetas, plantillas,
 líneas de `.gitignore` y hooks (útil si otra herramienta reemplazó
 `.claude/settings.json`). Si `espacio.json` está roto o falta, vuelve a la
@@ -370,6 +429,7 @@ revisa la copia y vuelve a aplicar su cambio.
 |---|---|
 | `montar.py --respuestas r.json [--dry-run]` | Montar o ampliar (`--actualizar`, `--json`, `--raiz`) |
 | `verificar.py` | Estado: OK, FALTA, DIVERGE, AVISO (`--json`) |
+| `explorar.py` | Lo que hay en la carpeta antes de la entrevista (`--json`, `--texto <ruta>`, `--skills`, `--instalar-skills`) |
 | `revisar.py` | Borrador automático de la revisión de skills existentes (`--borrador`, `--pendientes`, `--resumen`) |
 | `propuesta.py` | La propuesta del paso 6, en lenguaje sencillo y lista para mostrar |
 | `inventario.py` | Skills, comandos, agentes, reglas, hooks y MCP que ya trae el repositorio (`--json`, `--cambios`, `--guardar`) |

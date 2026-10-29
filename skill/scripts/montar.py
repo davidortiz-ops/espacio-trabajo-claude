@@ -19,6 +19,7 @@ Código de salida: 0 bien, 1 hubo errores, 2 las respuestas no pasan la validaci
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import re
 import shutil
@@ -113,6 +114,43 @@ def validar_skills(bloque, existentes: list[str]) -> list[str]:
     return err
 
 
+def _cubierto(doc: str, patrones: list[str]) -> bool:
+    return any(fnmatch.fnmatch(doc, p) or doc.startswith(p.rstrip("/") + "/") or doc == p for p in patrones)
+
+
+def validar_carpeta(bloque, docs: list[str], raiz: Path) -> list[str]:
+    """Lo aprendido de la carpeta: cada documento se leyó, o se dice por qué no."""
+    if not docs and not bloque:
+        return []
+    if not isinstance(bloque, dict) or not str(bloque.get("resumen", "")).strip():
+        return [f"la carpeta tiene {len(docs)} documentos: falta el bloque 'carpeta' con lo que se aprendió de "
+                "ellos (explorar.py y SKILL.md, paso 2)"]
+    err = []
+    if not FECHA.match(str(bloque.get("fecha", ""))):
+        err.append("carpeta.fecha debe ir en formato DD-mmm-YYYY")
+    leidos = []
+    for d in bloque.get("documentos", []):
+        if not d.get("archivo") or not d.get("aporta"):
+            err.append(f"cada documento de 'carpeta' necesita 'archivo' y 'aporta': {d}")
+        elif not (raiz / d["archivo"]).is_file():
+            err.append(f"carpeta.documentos: {d['archivo']!r} no existe")
+        else:
+            leidos.append(d["archivo"])
+    omitidos = []
+    for s in bloque.get("sin_leer", []):
+        if not s.get("archivos") or not s.get("motivo"):
+            err.append(f"cada entrada de carpeta.sin_leer necesita 'archivos' (ruta, carpeta/ o patrón) y 'motivo': {s}")
+        else:
+            omitidos.append(s["archivos"])
+    if docs and not leidos:
+        err.append("carpeta.documentos está vacío: lee al menos los documentos principales de la carpeta")
+    falta = [x for x in docs if x not in leidos and not _cubierto(x, omitidos)]
+    if falta:
+        err.append(f"{len(falta)} documentos sin leer ni justificar en carpeta.sin_leer: " + ", ".join(falta[:10])
+                   + (" …" if len(falta) > 10 else ""))
+    return err
+
+
 def validar(cfg: dict, exigir_rol: bool = False, existentes: list[str] | None = None) -> list[str]:
     err = []
     if exigir_rol or "investigacion_rol" in cfg:
@@ -184,7 +222,7 @@ def validar(cfg: dict, exigir_rol: bool = False, existentes: list[str] | None = 
 def combinar(viejo: dict, nuevo: dict) -> dict:
     """El perfil y la arquitectura nuevos mandan; carpetas, proyectos y credenciales se suman."""
     res = json.loads(json.dumps(viejo))
-    for k in ("perfil", "idioma", "trato", "git", "investigacion_rol", "skills_existentes"):
+    for k in ("perfil", "idioma", "trato", "git", "investigacion_rol", "skills_existentes", "carpeta"):
         if k in nuevo:
             res[k] = nuevo[k]
     arq_v, arq_n = res.setdefault("arquitectura", {}), nuevo.get("arquitectura", {})
@@ -338,6 +376,23 @@ def documentos_skills(cfg: dict) -> tuple[str, str]:
                for f in b.get("fuentes", [])]
     inv += ["## Fuentes", "", "\n".join(fuentes) or "Ninguna.", ""]
     return "\n".join(inv), "\n".join(ctx) + "\n"
+
+
+def documento_carpeta(cfg: dict) -> str:
+    b = cfg["carpeta"]
+    partes = ["# Lo que había en la carpeta", "",
+              f"Revisada el {b['fecha']} al preparar el espacio de **{cfg['perfil']['proyecto']}**. Léelo antes de "
+              "trabajar: es lo que la persona ya tenía, y no se le vuelve a preguntar.", "",
+              "## Resumen", "", b["resumen"].strip(), ""]
+    if b.get("aprendido"):
+        partes += ["## Lo que se aprendió", "", lista_md(b["aprendido"]), ""]
+    if b.get("documentos"):
+        partes += ["## Documentos", "", "| Archivo | Qué aporta |", "|---|---|"]
+        partes += [f"| `{d['archivo']}` | {d['aporta']} |" for d in b["documentos"]]
+        partes.append("")
+    if b.get("sin_leer"):
+        partes += ["## Sin leer", ""] + [f"- `{s['archivos']}`: {s['motivo']}" for s in b["sin_leer"]] + [""]
+    return "\n".join(partes)
 
 
 def escribir_generado(raiz: Path, p: Path, texto: str, rep: Reporte, seco: bool) -> None:
@@ -616,6 +671,10 @@ def montar(raiz: Path, cfg: dict, seco: bool, forzar: bool, cfg_cambio: bool) ->
         for proy in unidades:
             ctx = comun.base_dir(comun.resolver(cfg, proy)["contexto"])
             escribir_generado(raiz, raiz / ctx / "skills-del-repositorio.md", contexto, rep, seco)
+    if cfg.get("carpeta"):
+        for proy in unidades:
+            ctx = comun.base_dir(comun.resolver(cfg, proy)["contexto"])
+            escribir_generado(raiz, raiz / ctx / "lo-que-habia-en-la-carpeta.md", documento_carpeta(cfg), rep, seco)
     plantilla_atajo = (PLANTILLA / "atajo.md").read_text(encoding="utf-8")
     for at in comun.atajos(cfg):
         crear_si_falta(raiz / at["ruta"], render(plantilla_atajo, dict(
@@ -669,10 +728,21 @@ def main(argv=None) -> int:
     if a.actualizar:
         cfg["version"] = comun.VERSION
     existentes = None
+    errores = []
     if a.respuestas:
+        import explorar
         import inventario
+        sueltas = explorar.skills_sin_instalar(raiz)
+        if sueltas:
+            errores.append("hay skills en la carpeta sin instalar en .claude/skills/ ("
+                           + ", ".join(f"{s['nombre']} ← {s['origen']}" for s in sueltas)
+                           + "): instálalas con explorar.py --instalar-skills y revísalas antes de montar")
         existentes = [s["nombre"] for s in inventario.skills(raiz)]
-    errores = validar(cfg, exigir_rol=bool(a.respuestas), existentes=existentes)
+        if not viejo:
+            propio = Path(a.respuestas).name
+            docs = [d for d in explorar.documentos(raiz) if d != propio]
+            errores += validar_carpeta(nuevo.get("carpeta"), docs, raiz)
+    errores += validar(cfg, exigir_rol=bool(a.respuestas), existentes=existentes)
     if errores:
         for e in errores:
             print(f"VALIDACIÓN: {e}", file=sys.stderr)

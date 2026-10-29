@@ -18,12 +18,17 @@ paso con más detalle.
 **1. Abre PowerShell.** Presiona la tecla Windows, escribe `PowerShell` y
 presiona Enter.
 
-**2. Crea tu carpeta de trabajo y entra en ella.** Cambia `mi-proyecto` por
-el nombre de tu proyecto, sin espacios ni tildes:
+**2. Entra en tu carpeta de trabajo.** Puede ser cualquier carpeta, donde tú
+quieras, nueva o con tus archivos. Escribe `cd`, un espacio y la ruta de tu
+carpeta entre comillas:
 
 ```powershell
-mkdir C:\trabajo\mi-proyecto -Force; cd C:\trabajo\mi-proyecto
+cd "C:\ruta\de\tu\carpeta"
 ```
+
+Atajo: abre la carpeta en el Explorador de archivos, haz clic en la barra de
+dirección, escribe `powershell` y presiona Enter. PowerShell se abre ya dentro
+de ella (esto reemplaza los pasos 1 y 2).
 
 **3. Instala el skill Primer Paso** en esa carpeta:
 
@@ -42,11 +47,12 @@ claude
 **1. Abre Terminal.** Presiona Cmd + Espacio, escribe `Terminal` y presiona
 Enter.
 
-**2. Crea tu carpeta de trabajo y entra en ella.** Cambia `mi-proyecto` por
-el nombre de tu proyecto, sin espacios ni tildes:
+**2. Entra en tu carpeta de trabajo.** Puede ser cualquier carpeta, donde tú
+quieras, nueva o con tus archivos. Escribe `cd` y un espacio, arrastra la
+carpeta desde el Finder hasta la ventana de Terminal y presiona Enter:
 
 ```bash
-mkdir -p ~/trabajo/mi-proyecto && cd ~/trabajo/mi-proyecto
+cd "/ruta/de/tu/carpeta"
 ```
 
 **3. Instala el skill Primer Paso** en esa carpeta:
@@ -67,9 +73,14 @@ En el paso 3, el instalador revisa si tienes Git, Python, Node.js y
 Playwright, y te pregunta antes de instalar lo que falte: responde `S` y
 Enter.
 
-Para volver otro día, abre la terminal, entra a tu carpeta y abre Claude:
-`cd C:\trabajo\mi-proyecto; claude` en Windows o
-`cd ~/trabajo/mi-proyecto && claude` en Mac.
+En el paso 4, antes de preguntarte nada, Claude lee lo que ya tienes en tu
+carpeta (documentos, hojas de cálculo, presentaciones) y te cuenta lo que
+entendió para que lo corrijas. Si en la carpeta hay skills sin instalar, las
+instala. No mueve ni cambia tus archivos, y los que pueden tener claves no se
+abren.
+
+Para volver otro día, abre la terminal, entra a tu carpeta como en el paso 2
+y escribe `claude`.
 
 ![Cómo funciona Primer Paso](docs/como-funciona.svg)
 

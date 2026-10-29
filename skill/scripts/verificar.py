@@ -23,6 +23,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import bitacora  # noqa: E402
 import comun  # noqa: E402
+import explorar  # noqa: E402
 import inventario  # noqa: E402
 import programas  # noqa: E402
 
@@ -102,6 +103,10 @@ def revisar(raiz: Path, cfg: dict) -> list[tuple[str, str, str]]:
     for at in comun.atajos(cfg):
         item("OK" if (raiz / at["ruta"]).is_file() else "AVISO", f"atajo /{at['slug']}",
              "" if (raiz / at["ruta"]).is_file() else "no existe: montar.py lo crea")
+    for s in explorar.skills_sin_instalar(raiz):
+        item("FALTA", f"skill {s['nombre']}", f"está en {s['origen']} sin instalar en {s['destino']}/: "
+             + ("choca con una instalada distinta; decide con la persona" if s["estado"] == "conflicto"
+                else "explorar.py --instalar-skills"))
     if inventario.skills(raiz):
         por_revisar = inventario.cambios(raiz)
         item("AVISO" if por_revisar else "OK", "skills del repositorio",

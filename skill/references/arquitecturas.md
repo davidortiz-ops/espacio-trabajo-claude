@@ -64,7 +64,8 @@ carpeta por tarea, con su `memoria.md`; la crea `tarea.py`), y si hace falta
 más clasificación se resuelve con el nombre del archivo (`acta-comite-v2.md`),
 no con otra subcarpeta. Si el repositorio vive en una carpeta muy anidada
 (por ejemplo, dentro de una carpeta sincronizada con un nombre largo),
-sugerirle a la persona moverlo a una ruta corta (`C:\trabajo\`, `~/trabajo/`).
+avisarle a la persona que las rutas largas pueden fallar y que ella decide si
+lo deja ahí o lo mueve a una carpeta con una ruta más corta, que elige ella.
 
 ## Paso 4 — ¿Qué hay ya en el repositorio?
 

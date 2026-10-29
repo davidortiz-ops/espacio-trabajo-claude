@@ -2,9 +2,14 @@
 
 Objetivo: conocer a la persona y su trabajo lo suficiente para decidir la
 arquitectura de carpetas y preparar el entorno. Son **dos rondas**, más una
-confirmación. Lo que la persona ya haya dicho en la conversación (o lo que
-esté en los documentos del repositorio) se da por respondido: no se pregunta
-dos veces.
+confirmación. La entrevista va **después** de leer la carpeta (SKILL.md,
+paso 2): lo que la persona ya haya dicho en la conversación o lo que digan sus
+documentos se da por respondido y no se pregunta dos veces.
+
+Si la carpeta tenía material, la ronda abierta empieza mostrando lo que se
+entendió (*«Por lo que vi en tu carpeta, trabajas en… y cada mes haces…
+¿Es así? ¿Qué corregirías?»*) y solo pregunta los puntos de abajo que el
+material no respondió.
 
 ## 1. Ronda abierta — un solo mensaje
 
@@ -117,10 +122,29 @@ Se escribe en la raíz con `Write`; `montar.py` lo borra al terminar bien.
     {"nombre": "Intérprete del lenguaje de análisis", "para": "Correr los scripts de limpieza y cálculo",
      "comprobar": "<comando> --version", "instalar": "Instalador oficial (URL de la fuente oficial)"}
   ],
+  "carpeta": {
+    "fecha": "29-oct-2026",
+    "resumen": "Exportes semanales del ERP desde enero y un tablero en hoja de cálculo que se actualiza cada lunes.",
+    "aprendido": ["El tablero se envía a la gerencia de operaciones", "Los exportes llegan en CSV con la misma estructura"],
+    "documentos": [
+      {"archivo": "Manual del tablero.docx", "aporta": "Cómo se calcula cada indicador y a quién se envía"},
+      {"archivo": "tablero.xlsx", "aporta": "Las hojas e indicadores actuales"}
+    ],
+    "sin_leer": [
+      {"archivos": "exportes/", "motivo": "Exportes semanales con la misma estructura; se leyó el más reciente"}
+    ]
+  },
   "investigacion_rol": { "…": "ver references/investigar-rol.md § 6" },
   "skills_existentes": { "…": "solo si el repositorio ya tenía skills: references/skills-existentes.md § 5" }
 }
 ```
+
+`carpeta`: lo que se aprendió de la carpeta antes de la entrevista. Obligatorio
+en el primer montaje si `explorar.py` encontró documentos: cada uno debe estar
+en `documentos` (con `archivo` y `aporta`) o cubierto por `sin_leer`
+(`archivos` es una ruta, una carpeta terminada en `/` o un patrón como
+`fotos/*.jpg`, siempre con `motivo`). Además, `montar.py` no acepta el
+montaje mientras haya skills en la carpeta sin instalar en `.claude/skills/`.
 
 `programas`: cada uno con `nombre`, `para` y `comprobar` (el comando que
 muestra su versión; su primera palabra debe ser el ejecutable, que

@@ -1,4 +1,4 @@
-# Instala o actualiza el skill Primer Paso (primeros-pasos) en el repositorio de la carpeta actual.
+# Instala o actualiza el skill Primer Paso (primeros-pasos) en la carpeta actual, sea cual sea su ruta.
 #
 #   irm https://raw.githubusercontent.com/davidortiz-ops/espacio-trabajo-claude/main/install.ps1 | iex
 #
@@ -18,7 +18,7 @@
     try {
         $destinoRepo = (Get-Location).ProviderPath
         if ($destinoRepo.TrimEnd('\') -ieq $HOME.TrimEnd('\')) {
-            Falla 'estás en tu carpeta personal. Entra primero a la carpeta del repositorio donde vas a trabajar (cd ruta\a\tu-repositorio) y vuelve a ejecutar el comando.'
+            Falla 'estás en tu carpeta personal. Entra primero a la carpeta donde vas a trabajar (cd "ruta\de\tu\carpeta") y vuelve a ejecutar el comando.'
         }
 
         $tmp = Join-Path ([IO.Path]::GetTempPath()) ('primeros-pasos-' + [guid]::NewGuid().ToString('N'))
