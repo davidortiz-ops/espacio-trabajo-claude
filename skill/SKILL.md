@@ -164,7 +164,7 @@ que pueden tener claves (nunca se leen ni se abren) y las skills sin instalar.
    u organizaciones que aparecen y los accesos que harán falta. Solo lo que
    el material dice: lo que no esté escrito se pregunta, no se supone.
 4. **Guardarlo para el montaje** en el bloque `carpeta` de
-   `respuestas-espacio.json` (`references/entrevista.md` § 5): cada documento
+   `respuestas-espacio.json` (`references/entrevista.md` § 6): cada documento
    leído con lo que aporta, lo aprendido y lo que no se leyó con su motivo.
    `montar.py` lo exige cuando la carpeta tiene documentos (cada uno, leído o
    justificado) y lo deja en `<contexto>/lo-que-habia-en-la-carpeta.md`.
@@ -197,15 +197,24 @@ hallazgos dudosos y decidir con la persona. Detalle en
 
 ## Paso 3 — Entrevista
 
-Abre con una frase: *«Voy a preparar tu espacio de trabajo. Son unas pocas
-preguntas y no guardo nada hasta que me confirmes.»* Si la carpeta tenía
-material, empieza por lo que entendiste de ella (cinco o seis líneas: qué
-haces, para qué es el proyecto, qué tareas ves que se repiten) y pide que lo
-corrija; de la ronda abierta pregunta solo lo que la carpeta no respondió.
-Sigue `references/entrevista.md`: una ronda abierta (cargo, proyecto y objetivo,
-conocimientos, tareas, herramientas), como mucho una repregunta, y una ronda
-cerrada con `AskUserQuestion` (uno o varios proyectos, destinatarios, trato,
-historial de versiones).
+Sigue `references/entrevista.md`. En corto:
+
+1. **Apertura:** por qué importa lo que vas a preguntar (para ayudarle en su
+   cargo: qué temas dominar, cómo ordenar sus carpetas, qué tareas hacer con
+   él desde el primer día) y qué pasa con sus datos: se usan solo para eso,
+   quedan en su carpeta, no se publican ni se comparten con otras personas.
+   Nunca digas que la IA no los ve.
+2. **Invitación opcional** a compartir su hoja de vida en PDF, su perfil de
+   LinkedIn descargado en PDF o un enlace o documento del proyecto. De la
+   hoja de vida solo se saca lo profesional; sus habilidades se cruzan con lo
+   que exige el rol (paso 4).
+3. **Si la carpeta o los archivos ya lo dicen**, muéstrale lo que entendiste
+   (cinco o seis líneas) y confírmalo con una opción.
+4. **Como mucho dos preguntas abiertas de una línea** (cargo; proyecto y
+   objetivo), solo si no se saben.
+5. **El resto, para elegir:** dos `AskUserQuestion` como mucho (tareas,
+   entregables, herramientas y temas; luego modo, destinatarios, trato e
+   historial), con opciones armadas con lo que ya se sabe.
 
 ## Paso 4 — Investigar el rol
 
@@ -234,7 +243,7 @@ entregables. Escribe el porqué en una frase.
 ## Paso 6 — Proponer y confirmar
 
 Escribe `respuestas-espacio.json` en la raíz (esquema en
-`references/entrevista.md` § 5) y valida en seco:
+`references/entrevista.md` § 6) y valida en seco:
 
 ```bash
 python <skill>/scripts/montar.py --respuestas respuestas-espacio.json --dry-run

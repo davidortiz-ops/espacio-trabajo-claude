@@ -422,6 +422,7 @@ def variables(cfg: dict, raiz: Path) -> dict:
         "OBJETIVO": p["objetivo"],
         "DESTINATARIOS": p.get("destinatarios") or "—",
         "CONOCIMIENTOS": lista_md(p.get("conocimientos")),
+        "HABILIDADES": lista_md(p.get("habilidades"), "No las compartió."),
         "TAREAS": lista_md(p.get("tareas")),
         "HERRAMIENTAS": lista_md(p.get("herramientas")),
         "RESPONSABILIDADES": lista_md(inv.get("responsabilidades")),

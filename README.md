@@ -79,7 +79,12 @@ Enter.
 
 En el paso 4, antes de preguntarte nada, Claude lee lo que ya tienes en tu
 carpeta (documentos, hojas de cálculo, presentaciones) y te cuenta lo que
-entendió para que lo corrijas. Si en la carpeta hay skills sin instalar, las
+entendió para que lo corrijas. Luego te explica para qué sirve cada dato y te
+hace unas preguntas, casi todas para elegir. Si quieres, puedes compartir tu
+hoja de vida en PDF, tu perfil de LinkedIn descargado en PDF o un enlace del
+proyecto: así sabe qué habilidades tienes y cuáles debe aportar. Esa
+información es solo para ayudarte en tu trabajo, queda en tu carpeta y no se
+comparte con otras personas. Si en la carpeta hay skills sin instalar, las
 instala. No mueve ni cambia tus archivos, y los que pueden tener claves no se
 abren.
 

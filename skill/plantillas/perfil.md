@@ -12,6 +12,13 @@ nuevo», «ahora también hago…»).
 - **Objetivo:** {{OBJETIVO}}
 - **Para quién es el trabajo:** {{DESTINATARIOS}}
 
+## Lo que ya sabe hacer la persona
+
+De su hoja de vida, su perfil profesional o sus respuestas. En estos temas se
+le habla como a un par; lo que el rol exige y no está aquí lo aporta Claude.
+
+{{HABILIDADES}}
+
 ## Conocimientos que Claude debe dominar para este trabajo
 
 {{CONOCIMIENTOS}}

@@ -52,6 +52,8 @@ def propuesta(resp: dict) -> str:
             out.append(f"- `{ruta}` — {para}")
     out += ["", f"**Lo que voy a saber de ti:** que eres {p.get('cargo', '')}, que tu objetivo es "
                 f"{p.get('objetivo', '').rstrip('.').lower()} y cómo haces tus tareas."]
+    if p.get("habilidades"):
+        out.append("Lo que ya dominas (te hablaré como a un par): " + ", ".join(p["habilidades"][:6]) + ".")
 
     if inv:
         out += ["", "**Lo que encontré de tu rol** (con fuentes):"]

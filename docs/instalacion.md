@@ -75,9 +75,16 @@ que sí. Luego escribe `empezar` y presiona Enter.
 Primero Claude lee lo que ya hay en tu carpeta: documentos, hojas de cálculo y
 presentaciones. Si encuentra skills sin instalar, las instala. No mueve ni
 cambia tus archivos, y no abre los que pueden tener claves. Después te cuenta
-lo que entendió y te pregunta solo lo que falte: tu cargo, tu proyecto, qué
-quieres lograr, tus tareas habituales y las herramientas que usas. Responde
-con tus palabras; no hace falta que sea largo.
+lo que entendió, te explica para qué sirve cada dato y te pregunta solo lo que
+falte. Casi todas las preguntas son para elegir; las que no, se responden en
+una línea.
+
+Si quieres ahorrar preguntas, comparte tu hoja de vida en PDF, tu perfil de
+LinkedIn descargado en PDF (en tu perfil: «Más» → «Guardar en PDF») o un
+enlace o documento del proyecto. Arrástralo a la ventana de Claude o déjalo en
+tu carpeta. Se usa solo para ayudarte en tu trabajo: de la hoja de vida toma
+lo profesional, nada personal; queda en tu carpeta y no se comparte con otras
+personas.
 
 Mientras tanto investiga tu rol y al final te muestra una propuesta. Léela y
 responde «Sí, prepáralo» o pide los cambios que quieras.

@@ -86,6 +86,7 @@ terminar en algo concreto de la arquitectura o del protocolo de trabajo.
 | Varios destinatarios o clientes que no deben cruzarse | Modo multiproyecto |
 | Errores típicos del rol | Un punto de verificación en el protocolo, anotado como memoria inicial |
 | Conocimientos que el oficio exige y la persona no listó | Sumarlos a `perfil.conocimientos` |
+| Habilidades que el oficio exige y no aparecen en `perfil.habilidades` (hoja de vida, LinkedIn o respuestas) | Sumarlas a `perfil.conocimientos`: las aporta Claude |
 
 Los lineamientos se aplican en el paso 5 con `references/arquitecturas.md`:
 deciden entre tipos base parecidos, justifican carpetas extra y escriben el
@@ -123,7 +124,7 @@ En `respuestas-espacio.json`, bloque `investigacion_rol`:
 Python, Node.js y Playwright son la base de todo espacio y no se listan:
 `programas.py` ya los revisa. Los programas que el rol sume no van dentro de
 este bloque sino en `programas`, en la raíz de
-`respuestas-espacio.json` (esquema en `references/entrevista.md` § 5), porque
+`respuestas-espacio.json` (esquema en `references/entrevista.md` § 6), porque
 `verificar.py` y el aviso de inicio los comprueban en cada sesión. Solo se
 listan los que una tarea confirmada necesite, cada uno con el comando que
 muestra su versión y su fuente oficial de instalación. Instalar algo siempre

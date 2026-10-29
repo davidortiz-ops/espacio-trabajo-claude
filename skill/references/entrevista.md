@@ -1,57 +1,115 @@
 # Entrevista inicial
 
 Objetivo: conocer a la persona y su trabajo lo suficiente para decidir la
-arquitectura de carpetas y preparar el entorno. Son **dos rondas**, más una
-confirmación. La entrevista va **después** de leer la carpeta (SKILL.md,
-paso 2): lo que la persona ya haya dicho en la conversación o lo que digan sus
-documentos se da por respondido y no se pregunta dos veces.
+arquitectura de carpetas y preparar el entorno, **sin cansarla**. La
+entrevista va **después** de leer la carpeta (SKILL.md, paso 2): lo que la
+persona ya haya dicho en la conversación o lo que digan sus documentos se da
+por respondido y no se pregunta dos veces.
 
-Si la carpeta tenía material, la ronda abierta empieza mostrando lo que se
-entendió (*«Por lo que vi en tu carpeta, trabajas en… y cada mes haces…
-¿Es así? ¿Qué corregirías?»*) y solo pregunta los puntos de abajo que el
-material no respondió.
+Reglas de la entrevista:
 
-## 1. Ronda abierta — un solo mensaje
+- **Casi todo se elige, no se escribe.** Las preguntas van con
+  `AskUserQuestion` y opciones armadas con lo que ya se sabe (la carpeta, su
+  hoja de vida, el cargo). Las preguntas abiertas son como mucho dos, y se
+  responden en una línea.
+- **Nada de respuestas largas o complejas.** Si la persona escribe mucho, no
+  le pidas más: resume tú y confírmalo con una opción.
+- **Cada pregunta dice para qué sirve**, en pocas palabras, en la misma
+  pregunta o en su descripción.
 
-Estas respuestas son texto libre, así que van en un mensaje normal (no en
-`AskUserQuestion`, que obliga a elegir opciones). Usa este texto, adaptando
-el tono:
+## 1. Apertura — por qué se pregunta y qué pasa con los datos
 
-> Voy a preparar tu espacio de trabajo. Primero quiero entender qué haces;
-> responde con tus palabras, no hace falta que sea largo:
+Un solo mensaje corto, antes de la primera pregunta. Adapta el tono, pero
+conserva las tres ideas: para qué sirve, qué puede compartir y qué pasa con
+sus datos.
+
+> Voy a preparar tu espacio de trabajo. Para ayudarte bien en tu cargo
+> necesito entender qué haces, qué entregas y qué sabes hacer: así sé qué
+> temas dominar, cómo ordenar tus carpetas y qué tareas puedo hacer contigo
+> desde el primer día. Son unas pocas preguntas, casi todas para elegir.
 >
-> 1. **¿Cuál es tu cargo** y en qué área o equipo trabajas?
-> 2. **¿En qué proyecto vas a trabajar aquí** y cuál es su objetivo? ¿Qué
->    tiene que existir cuando el proyecto esté bien hecho?
-> 3. **¿Qué conocimientos debería tener yo** para ayudarte bien? (temas,
->    normas, metodologías, herramientas, el negocio del cliente…)
-> 4. **¿Cuáles son tus tareas habituales?** Las que haces cada semana o cada
->    mes, y lo que entregas en cada una.
-> 5. **¿Qué herramientas o servicios usas?** (hojas de cálculo, un CRM, una
->    plataforma, APIs, repositorios de código…)
+> Si quieres ahorrar preguntas, compárteme lo que tengas a mano (todo es
+> opcional):
+> - **Tu hoja de vida en PDF**, para saber qué habilidades tienes y cuáles
+>   debo aportar yo.
+> - **Tu perfil de LinkedIn descargado en PDF** (en tu perfil: «Más» →
+>   «Guardar en PDF»). El enlace solo a veces funciona, porque LinkedIn no
+>   deja ver los perfiles sin iniciar sesión.
+> - **Un enlace o documento del proyecto** (sitio web, presentación,
+>   propuesta, brief).
 >
-> No me compartas contraseñas ni claves: cuando haga falta un acceso, te
-> explico cómo dejarlo guardado de forma segura.
+> Puedes arrastrar el archivo a esta ventana o dejarlo en tu carpeta. Lo que
+> me compartas lo uso solo para ayudarte en tu trabajo: queda guardado en tu
+> carpeta, no se publica y no lo comparto con otras personas. No me pases
+> contraseñas ni claves.
 
-Si una respuesta queda corta para decidir (por ejemplo, «hago informes» sin
-decir de qué ni para quién), haz **una** repregunta concreta en el mismo
-estilo. No más de una.
+Sobre los datos, di solo lo que es cierto: lo que la persona comparte se
+procesa en esta conversación con Claude para poder ayudarle, se guarda en su
+carpeta y no se publica ni se envía a nadie más. **No prometas** que «la IA
+no lo ve»: la ve, porque es la que la lee. Si pregunta por el tratamiento de
+sus datos por parte del servicio de Claude, remítela a la política de
+privacidad de su cuenta o de su organización.
 
-## 2. Ronda cerrada — una sola `AskUserQuestion`
+Con lo que comparta:
 
-Hasta cuatro preguntas con opciones. Omite las que ya se respondieron.
+- **Hoja de vida o perfil de LinkedIn:** sacar solo lo profesional (cargo
+  actual, experiencia, estudios, habilidades, herramientas, idiomas, sector).
+  Nunca se guardan su documento de identidad, teléfono, dirección, fecha de
+  nacimiento ni nada personal. Las habilidades van a `perfil.habilidades`.
+  Al comparar con la investigación del rol (paso 4): lo que el rol exige y la
+  persona ya domina se trata con lenguaje de par; lo que exige y no aparece
+  en su perfil va a `perfil.conocimientos`, para que Claude lo aporte.
+- **Un enlace:** leerlo (si no se puede abrir, decirlo en una frase y seguir).
+  Lo útil del proyecto va al bloque `carpeta` como cualquier otro documento.
+- Si no comparte nada, se sigue sin insistir.
+
+## 2. Preguntas abiertas — como mucho dos, de una línea
+
+Solo lo que ni la carpeta ni los archivos respondieron, en un mensaje normal
+y con un ejemplo de lo corto que puede ser:
+
+> 1. **¿Cuál es tu cargo?** (por ejemplo: «coordinadora de compras»)
+> 2. **¿En qué proyecto vas a trabajar aquí y qué quieres lograr?** En una
+>    frase (por ejemplo: «el informe mensual de ventas para la gerencia»).
+
+Si ya se saben por la carpeta o la hoja de vida, no se preguntan: se
+confirman en la primera `AskUserQuestion` («Entendí que eres … y que el
+proyecto es …» · «Sí, es así» · «No exactamente»; con «No exactamente», una
+línea para corregir).
+
+## 3. Preguntas para elegir — dos `AskUserQuestion` como mucho
+
+Hasta cuatro preguntas por llamada y de dos a cuatro opciones cada una (la
+herramienta agrega «Otro» para escribir). Las opciones se arman con lo que ya
+se sabe: las tareas que se repiten en la carpeta, las habituales del cargo
+(con lo que ya sepas de él; la investigación a fondo del paso 4 puede sumar
+otras, que se confirman en la propuesta), los tipos de archivo que usa y su
+hoja de vida. Omite las que ya estén respondidas.
+
+**Primera llamada — su trabajo**
+
+| Pregunta | Tipo | Opciones (ejemplos) | Para qué se usa |
+|---|---|---|---|
+| ¿Cuáles de estas tareas haces habitualmente? | selección múltiple | 3 o 4 tareas concretas deducidas, con su frecuencia en la descripción | `perfil.tareas`; cada una tiene su atajo |
+| ¿Qué entregas con más frecuencia? | selección múltiple | Informes o documentos · Hojas de cálculo o tableros · Presentaciones · Código o automatizaciones | Categorías de entregables y arquitectura |
+| ¿Qué herramientas usas en tu día a día? | selección múltiple | Las que se deducen de la carpeta, del cargo y de la hoja de vida | `perfil.herramientas`, accesos y programas |
+| ¿Qué temas debo dominar para ayudarte? | selección múltiple | 3 o 4 temas del oficio que no aparezcan como fortaleza en su perfil | `perfil.conocimientos` |
+
+**Segunda llamada — cómo quiere trabajar**
 
 | Pregunta | Opciones | Para qué se usa |
 |---|---|---|
 | ¿Cuántos proyectos vas a llevar en este espacio? | Uno solo · Varios (clientes, cuentas o iniciativas distintas) | `arquitectura.modo` |
-| ¿Para quién es principalmente lo que produces? | Clientes externos · Mi equipo o mi jefe · Solo para mí · Público (publicaciones, comunidad) | `perfil.destinatarios`; pesa en la elección de arquitectura y en el tono de los entregables |
+| ¿Para quién es principalmente lo que produces? | Clientes externos · Mi equipo o mi jefe · Solo para mí · Público (publicaciones, comunidad) | `perfil.destinatarios`; pesa en la arquitectura y en el tono |
 | ¿Cómo prefieres que te hable? | Directo y sin tecnicismos · Técnico, conozco las herramientas · Con explicaciones paso a paso | `trato` |
 | ¿Quieres que lleve un historial de versiones de los archivos? | Sí (recomendado) · No | `git` |
 
-Si eligió «Varios», pregunta en un mensaje corto los nombres de los proyectos
-que ya sabe (se pueden agregar después).
+Si eligió «Varios», pide en un mensaje corto los nombres de los proyectos
+que ya sabe (se pueden agregar después). Si en una respuesta eligió «Otro» y
+escribió algo largo, resúmelo tú en una línea; no hagas más preguntas
+abiertas.
 
-## 3. Inferir sin preguntar
+## 4. Inferir sin preguntar
 
 - **Idioma:** el de la conversación.
 - **Credenciales:** de las herramientas mencionadas, deduce qué accesos van a
@@ -69,13 +127,13 @@ que ya sabe (se pueden agregar después).
   (qué produce). De aquí salen las categorías de entregables y, a futuro, los
   candidatos a skill.
 
-## 4. Confirmación
+## 5. Confirmación
 
 Muestra la propuesta en lenguaje sencillo (ver SKILL.md, paso 6) y pregunta
 con `AskUserQuestion`: «Sí, prepáralo» · «Quiero cambiar algo» · «Ahora no».
 Sin un «Sí, prepáralo» en esta conversación no se escribe nada.
 
-## 5. Esquema de `respuestas-espacio.json`
+## 6. Esquema de `respuestas-espacio.json`
 
 Se escribe en la raíz con `Write`; `montar.py` lo borra al terminar bien.
 
@@ -91,6 +149,7 @@ Se escribe en la raíz con `Write`; `montar.py` lo borra al terminar bien.
     "proyecto": "Tablero de indicadores logísticos",
     "objetivo": "Que la gerencia vea cada lunes el cumplimiento de entregas y los cuellos de botella.",
     "destinatarios": "Mi jefe y la gerencia de operaciones",
+    "habilidades": ["Hojas de cálculo avanzadas (tablas dinámicas)", "Gestión de inventarios", "Inglés intermedio"],
     "conocimientos": ["Indicadores logísticos (OTIF, lead time)", "Hojas de cálculo y limpieza de datos", "Normas de la empresa sobre datos de clientes"],
     "tareas": [
       {"tarea": "Actualizar el tablero semanal", "frecuencia": "semanal", "entrega": "tablero + resumen de 1 página"},

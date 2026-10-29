@@ -89,6 +89,7 @@ resp = {
     "perfil": {"cargo": "Analista de operaciones", "area": "Operaciones", "proyecto": "Tablero logístico",
                "objetivo": "Indicadores semanales de cumplimiento de entregas.", "destinatarios": "Gerencia",
                "conocimientos": ["OTIF y lead time", "Limpieza de datos"],
+               "habilidades": ["Tablas dinámicas", "Gestión de inventarios"],
                "tareas": [{"tarea": "Actualizar el tablero semanal", "frecuencia": "semanal", "entrega": "tablero"}],
                "herramientas": ["Hoja de cálculo", "Sistema de gestión"]},
     "arquitectura": {"tipo": "analisis-de-datos", "modo": "unico", "por_que": "Exportes del ERP a indicadores.",
@@ -135,6 +136,8 @@ if (A / "BITACORA.md").exists():
 r = run(A, ["verificar.py"], esperado=0)
 if "AVISO" not in r.stdout or "Programa ausente" not in r.stdout:
     fallos.append("verificar no avisó del programa que falta")
+if "Gestión de inventarios" not in (A / "docs/espacio-de-trabajo/perfil.md").read_text(encoding="utf-8"):
+    fallos.append("el perfil no lleva las habilidades de la persona")
 doc_rol = A / "investigacion/27-oct-2026-rol-analista-de-operaciones.md"
 if not doc_rol.is_file() or "ejemplo.org/ocupaciones" not in doc_rol.read_text(encoding="utf-8"):
     fallos.append("montar no guardó la investigación del rol con sus fuentes")
