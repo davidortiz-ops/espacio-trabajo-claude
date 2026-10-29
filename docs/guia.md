@@ -137,7 +137,8 @@ a ejecutar la línea de instalación.
 
 | Lo que ves | Qué hacer |
 |---|---|
-| El instalador dice que estás en tu carpeta personal | Entra a la carpeta del proyecto (`cd ruta/del/proyecto`) y repite |
+| El instalador pregunta por tu carpeta | Escribe la ruta de tu carpeta de trabajo, o arrástrala a la ventana, y presiona Enter |
+| Otro mensaje al instalar | Búscalo en la [guía de instalación](instalacion.md#si-algo-falla) |
 | Falta Python, Node.js o Playwright | Acepta la instalación o pide «instala los programas que faltan» |
 | Claude no reconoce «empezar» | Cierra y vuelve a abrir Claude Code en la carpeta del proyecto |
 | Un aviso dice que faltan piezas | Escribe «repara mi espacio» |

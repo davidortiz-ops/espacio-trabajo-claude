@@ -43,7 +43,8 @@ BASE = [
      "brew": "brew install node", "apt": "sudo apt-get install -y nodejs npm", "dnf": "sudo dnf install -y nodejs npm"},
     {"nombre": "playwright", "titulo": "Playwright", "para": "Navegador automatizado para investigar y probar páginas",
      "descarga": "https://playwright.dev/docs/intro", "requiere": "node",
-     "todos": "npm install -g playwright && npx playwright install chromium"},
+     # Pasos sueltos: «&&» no existe en PowerShell 5.1 y «;» no separa en CMD.
+     "pasos": ["npm install -g playwright", "npx playwright install chromium"]},
 ]
 
 
@@ -81,8 +82,9 @@ def gestor() -> str | None:
 
 
 def comando(p: dict) -> str | None:
-    if p.get("todos"):
-        return p["todos"]
+    """La orden para mostrar: con «;», que sirve igual en PowerShell, bash y zsh."""
+    if p.get("pasos"):
+        return "; ".join(p["pasos"])
     g = gestor()
     return p.get(g) if g else None
 
@@ -133,7 +135,10 @@ def main(argv=None) -> int:
         if a.comando:
             print(p["comando"])
             return 0
-        r = subprocess.run(p["comando"], shell=True)
+        for paso in p.get("pasos") or [p["comando"]]:
+            r = subprocess.run(paso, shell=True)
+            if r.returncode != 0:
+                break
         if r.returncode != 0:
             print(f"La instalación de {p['titulo']} no terminó bien (código {r.returncode}). "
                   f"Alternativa: {p['descarga']}", file=sys.stderr)

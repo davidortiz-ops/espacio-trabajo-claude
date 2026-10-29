@@ -19,7 +19,9 @@ ejemplo `PS C:\Users\TuNombre>`.
 ## Paso 2. Entra en tu carpeta de trabajo
 
 Puede ser cualquier carpeta, donde tú quieras: una nueva o una que ya tenga
-tus archivos. Tus archivos se respetan.
+tus archivos. Tus archivos se respetan. La ruta de los ejemplos no existe:
+cámbiala por la de tu carpeta. Si no sabes cuál es, salta al paso 3: el
+instalador te la pregunta.
 
 **En Windows:** escribe `cd`, un espacio y la ruta de tu carpeta entre
 comillas:
@@ -49,7 +51,7 @@ En la misma terminal, dentro de tu carpeta:
 irm https://raw.githubusercontent.com/davidortiz-ops/espacio-trabajo-claude/main/install.ps1 | iex
 ```
 
-**En Mac:**
+**En Mac** (solo en Mac: en Windows este comando falla):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/davidortiz-ops/espacio-trabajo-claude/main/install.sh | bash
@@ -106,9 +108,12 @@ queda intacto.
 
 | Lo que ves | Qué hacer |
 |---|---|
-| `'irm' is not recognized` | Estás en CMD, no en PowerShell. Vuelve al paso 1 y abre PowerShell |
-| `The token '&&' is not a valid statement separator` | Estás en PowerShell usando el comando de Mac. Usa el de Windows |
-| El instalador dice que estás en tu carpeta personal | Te faltó el paso 2: entra a tu carpeta de trabajo y repite el paso 3 |
+| `No se encuentra ningún parámetro que coincida con el nombre del parámetro 'fsSL'` (o `parameter name 'fsSL'`) | Estás en Windows con el comando de Mac. Usa el de Windows: `irm … \| iex` |
+| `'irm' no se reconoce como un comando interno o externo` (o `'irm' is not recognized`) | Estás en CMD, no en PowerShell. Vuelve al paso 1 y abre PowerShell |
+| `irm: command not found` o `iex: command not found` | Estás en Mac (o en Git Bash) con el comando de Windows. Usa el de Mac: `curl … \| bash` |
+| `cd: no such file or directory`, `No se encuentra la ruta de acceso` o `Cannot find path` | Escribiste la ruta del ejemplo, que no existe. Pon la de tu carpeta, o salta al paso 3: el instalador te la pregunta |
+| El instalador pregunta por tu carpeta | Estás en tu carpeta personal. Escribe la ruta de tu carpeta de trabajo, o arrástrala a la ventana, y presiona Enter; si no existe, te ofrece crearla |
+| `claude: command not found` o `'claude' no se reconoce` | Falta instalar Claude Code, o hay que cerrar y volver a abrir la terminal después de instalarlo |
 | Claude no responde a «empezar» | Escribe `/primeros-pasos` o cierra y vuelve a abrir Claude en tu carpeta |
 | Falta un programa después de instalarlo | Cierra y vuelve a abrir la terminal |
 

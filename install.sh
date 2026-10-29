@@ -13,9 +13,33 @@ DESTINO_REL=".claude/skills/primeros-pasos"
 aviso() { printf '%s\n' "$*"; }
 falla() { printf 'No se pudo instalar: %s\n' "$*" >&2; exit 1; }
 
+# Con «curl … | bash» la entrada es el propio script: las preguntas se leen de /dev/tty.
+INTERACTIVO=0
+if [ -z "${PRIMEROS_PASOS_SIN_PROGRAMAS:-}" ] && { : </dev/tty; } 2>/dev/null; then INTERACTIVO=1; fi
+
+no_sirve() {  # la carpeta personal o la raíz del disco no son una carpeta de trabajo
+  [ "$1" = "$(cd "$HOME" && pwd -P)" ] || [ "$1" = "/" ]
+}
+
 DESTINO_REPO="$(pwd -P)"
-if [ "$DESTINO_REPO" = "$(cd "$HOME" && pwd -P)" ]; then
-  falla "estás en tu carpeta personal. Entra primero a la carpeta donde vas a trabajar (cd \"ruta/de/tu/carpeta\") y vuelve a ejecutar el comando."
+if no_sirve "$DESTINO_REPO"; then
+  [ "$INTERACTIVO" = 1 ] || falla "estás en tu carpeta personal. Entra primero a la carpeta donde vas a trabajar y vuelve a ejecutar el comando."
+  aviso "Estás en tu carpeta personal, no en una carpeta de trabajo."
+  printf '%s' "Escribe la ruta de la carpeta donde vas a trabajar (o arrástrala aquí desde el Finder) y presiona Enter: " > /dev/tty
+  IFS= read -r ruta < /dev/tty || falla "no se recibió ninguna carpeta."
+  # Al arrastrar, Terminal pone una barra antes de cada espacio y un espacio al final.
+  ruta="$(printf '%s' "$ruta" | sed -e 's/[[:space:]]*$//' -e 's/^[[:space:]]*//' -e "s/^['\"]//" -e "s/['\"]\$//" -e 's/\\\(.\)/\1/g')"
+  case "$ruta" in "~"|"~/"*) ruta="$HOME${ruta#?}" ;; esac
+  [ -n "$ruta" ] || falla "no se recibió ninguna carpeta."
+  if [ ! -d "$ruta" ]; then
+    printf '%s [S/n] ' "La carpeta $ruta no existe. ¿La creo?" > /dev/tty
+    read -r r < /dev/tty || r=n
+    case "$r" in n|N|no|NO|No) falla "la carpeta $ruta no existe." ;; esac
+    mkdir -p "$ruta" || falla "no se pudo crear $ruta."
+  fi
+  DESTINO_REPO="$(cd "$ruta" && pwd -P)" || falla "no se pudo entrar a $ruta."
+  if no_sirve "$DESTINO_REPO"; then falla "esa es tu carpeta personal: elige o crea una carpeta para tu trabajo."; fi
+  cd "$DESTINO_REPO"
 fi
 
 TMP="$(mktemp -d)"
@@ -80,7 +104,7 @@ orden() {  # orden de instalación de un programa con el gestor de este sistema
     node:brew) echo "brew install node" ;;
     node:apt) echo "sudo apt-get install -y nodejs npm" ;;
     node:dnf) echo "sudo dnf install -y nodejs npm" ;;
-    playwright:*) echo "npm install -g playwright && npx playwright install chromium" ;;
+    playwright:*) echo "npm install -g playwright; npx playwright install chromium" ;;
   esac
 }
 descarga() {
@@ -91,9 +115,6 @@ descarga() {
     playwright) echo "https://playwright.dev/docs/intro" ;;
   esac
 }
-
-INTERACTIVO=0
-if [ -z "${PRIMEROS_PASOS_SIN_PROGRAMAS:-}" ] && { : </dev/tty; } 2>/dev/null; then INTERACTIVO=1; fi
 
 preguntar() {  # devuelve 0 si la persona acepta
   [ "$INTERACTIVO" = 1 ] || return 1
@@ -146,4 +167,5 @@ if [ ! -d "$DESTINO_REPO/.git" ]; then
 fi
 
 aviso ""
-aviso "Siguiente paso: abre Claude Code en esta carpeta y escribe «empezar»."
+aviso "Siguiente paso: abre Claude Code en tu carpeta y escribe «empezar»:"
+aviso "  cd \"$DESTINO_REPO\"; claude"

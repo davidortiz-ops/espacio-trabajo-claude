@@ -20,7 +20,8 @@ presiona Enter.
 
 **2. Entra en tu carpeta de trabajo.** Puede ser cualquier carpeta, donde tú
 quieras, nueva o con tus archivos. Escribe `cd`, un espacio y la ruta de tu
-carpeta entre comillas:
+carpeta entre comillas (la del ejemplo no existe; si no sabes la tuya, salta al
+paso 3 y el instalador te la pregunta):
 
 ```powershell
 cd "C:\ruta\de\tu\carpeta"
@@ -30,7 +31,8 @@ Atajo: abre la carpeta en el Explorador de archivos, haz clic en la barra de
 dirección, escribe `powershell` y presiona Enter. PowerShell se abre ya dentro
 de ella (esto reemplaza los pasos 1 y 2).
 
-**3. Instala el skill Primer Paso** en esa carpeta:
+**3. Instala el skill Primer Paso** en esa carpeta. Usa este comando y no el de
+Mac, que en PowerShell falla:
 
 ```powershell
 irm https://raw.githubusercontent.com/davidortiz-ops/espacio-trabajo-claude/main/install.ps1 | iex
@@ -49,13 +51,15 @@ Enter.
 
 **2. Entra en tu carpeta de trabajo.** Puede ser cualquier carpeta, donde tú
 quieras, nueva o con tus archivos. Escribe `cd` y un espacio, arrastra la
-carpeta desde el Finder hasta la ventana de Terminal y presiona Enter:
+carpeta desde el Finder hasta la ventana de Terminal y presiona Enter (si no
+lo haces, el instalador te pregunta la carpeta):
 
 ```bash
 cd "/ruta/de/tu/carpeta"
 ```
 
-**3. Instala el skill Primer Paso** en esa carpeta:
+**3. Instala el skill Primer Paso** en esa carpeta. Este comando es solo para
+Mac: en Windows falla con «parámetro 'fsSL'».
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/davidortiz-ops/espacio-trabajo-claude/main/install.sh | bash
@@ -78,6 +82,9 @@ carpeta (documentos, hojas de cálculo, presentaciones) y te cuenta lo que
 entendió para que lo corrijas. Si en la carpeta hay skills sin instalar, las
 instala. No mueve ni cambia tus archivos, y los que pueden tener claves no se
 abren.
+
+Si algo falla, la [guía de instalación](docs/instalacion.md#si-algo-falla) tiene
+cada mensaje de error con su solución.
 
 Para volver otro día, abre la terminal, entra a tu carpeta como en el paso 2
 y escribe `claude`.

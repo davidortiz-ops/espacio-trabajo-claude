@@ -16,9 +16,34 @@
     }
 
     try {
+        # La carpeta personal, la raíz de un disco o la de Windows no son una carpeta de trabajo
+        # (PowerShell como administrador abre en C:\Windows\System32).
+        function No-Sirve($ruta) {
+            $r = $ruta.TrimEnd('\')
+            return ($r -ieq $HOME.TrimEnd('\')) -or ($r -match '^[A-Za-z]:$') -or
+                   ($env:SystemRoot -and $r.StartsWith($env:SystemRoot, [StringComparison]::OrdinalIgnoreCase))
+        }
+
         $destinoRepo = (Get-Location).ProviderPath
-        if ($destinoRepo.TrimEnd('\') -ieq $HOME.TrimEnd('\')) {
-            Falla 'estás en tu carpeta personal. Entra primero a la carpeta donde vas a trabajar (cd "ruta\de\tu\carpeta") y vuelve a ejecutar el comando.'
+        if (No-Sirve $destinoRepo) {
+            if ($env:PRIMEROS_PASOS_SIN_PROGRAMAS) {
+                Falla 'no estás en una carpeta de trabajo. Entra primero a la carpeta donde vas a trabajar y vuelve a ejecutar el comando.'
+            }
+            Write-Host "Estás en $destinoRepo, que no es una carpeta de trabajo."
+            $ruta = Read-Host 'Escribe la ruta de la carpeta donde vas a trabajar (o arrástrala aquí desde el Explorador) y presiona Enter'
+            $ruta = "$ruta".Trim()
+            if ($ruta.StartsWith('& ')) { $ruta = $ruta.Substring(2).Trim() }
+            $ruta = $ruta.Trim('"').Trim("'")
+            if ($ruta -eq '~' -or $ruta.StartsWith('~\') -or $ruta.StartsWith('~/')) { $ruta = $HOME + $ruta.Substring(1) }
+            if (-not $ruta) { Falla 'no se recibió ninguna carpeta.' }
+            if (-not (Test-Path -LiteralPath $ruta -PathType Container)) {
+                $r = Read-Host "La carpeta $ruta no existe. ¿La creo? [S/n]"
+                if ($r -match '^(n|no)$') { Falla "la carpeta $ruta no existe." }
+                New-Item -ItemType Directory -Force -Path $ruta | Out-Null
+            }
+            $destinoRepo = (Resolve-Path -LiteralPath $ruta).ProviderPath
+            if (No-Sirve $destinoRepo) { Falla 'esa no es una carpeta de trabajo: elige o crea una carpeta para tu proyecto.' }
+            Set-Location -LiteralPath $destinoRepo
         }
 
         $tmp = Join-Path ([IO.Path]::GetTempPath()) ('primeros-pasos-' + [guid]::NewGuid().ToString('N'))
@@ -153,7 +178,8 @@
         }
 
         Write-Host ''
-        Write-Host 'Siguiente paso: abre Claude Code en esta carpeta y escribe «empezar».'
+        Write-Host 'Siguiente paso: abre Claude Code en tu carpeta y escribe «empezar»:'
+        Write-Host "  cd `"$destinoRepo`"; claude"
     } catch {
         if ($_.Exception.Message -ne 'instalacion-cancelada') {
             Write-Host "No se pudo instalar: $($_.Exception.Message)" -ForegroundColor Red
